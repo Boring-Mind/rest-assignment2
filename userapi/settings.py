@@ -143,3 +143,14 @@ MIN_PASSWORD_LENGTH = 8
 MEDIA_URL = '/uploads/'
 
 UPLOAD_ROOT = os.path.join(BASE_DIR, 'public', 'uploads')
+
+# REST configuration
+
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
+}

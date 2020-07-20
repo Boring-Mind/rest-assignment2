@@ -1,9 +1,11 @@
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.generic.edit import FormView
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import status
+from rest_framework.parsers import JSONParser, MultiPartParser
 
 from .forms import RegisterForm
 from .models import UserProfile
@@ -20,31 +22,37 @@ class RegisterAPIView(generics.CreateAPIView):
     """
     permission_classes = (permissions.AllowAny,)
     serializer_class = ProfileSerializer
+    parser_classes = [MultiPartParser, JSONParser]
+
+    def init_from_dict(self, data: dict):
+        self.username = data.get('username')
+        self.email = data.get('email')
+        self.password = data.get('password1')
+        self.password2 = data.get('password2')
+        self.photo = data.get('photo')
 
     def post(self, request, *args, **kwargs):
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
-        photo = request.data.get('photo')
+        if len(request.POST) > 1:
+            form = RegisterForm(request.POST)
+            if form.is_valid():
+                import pdb; pdb.set_trace()
+                self.init_from_dict(request.POST)
+                self.photo = request.FILES.get('photo')
+            else:
+                return render(request, 'html/register.html', {'form': form})
+        else:
+            self.init_from_dict(request.data)
 
-        if not all((username, email, password)):
-            return Response(
-                data={
-                    'message': 'Fill all required fields!'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        new_user = UserProfile.create(
-            username=username,
-            email=email,
-            password=password,
-            photo=photo
+        new_user = UserProfile.objects.create(
+            username=self.username,
+            email=self.email,
+            password=self.password,
+            photo=self.photo
         )
-        return Response(
-            data=ProfileSerializer(new_user).data,
-            status=status.HTTP_201_CREATED
-        )
+        return Response({
+            'data': ProfileSerializer(new_user).data,
+            'status': status.HTTP_201_CREATED
+        })
 
 
 class RegisterFormView(FormView):

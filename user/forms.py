@@ -22,7 +22,7 @@ class RegisterForm(UserCreationForm):
         strip=False,
         widget=forms.PasswordInput()
     )
-    photo = forms.ImageField()
+    photo = forms.ImageField(required=False)
 
     def crispy_init(self):
         """Initialize crispy-forms helper."""

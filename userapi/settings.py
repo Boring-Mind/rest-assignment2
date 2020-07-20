@@ -135,6 +135,10 @@ LOGIN_REDIRECT_URL = 'user:home'
 
 LOGOUT_REDIRECT_URL = 'user:home'
 
+REGISTER_URL = 'user:register'
+
+MIN_PASSWORD_LENGTH = 8
+
 # Media places
 MEDIA_URL = '/uploads/'
 

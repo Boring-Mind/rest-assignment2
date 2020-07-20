@@ -3,9 +3,9 @@ from django.contrib.auth.models import User
 
 
 class ProfileManager(models.Manager):
-    def create(self, username, email, photo=None):
+    def create(self, username, email, password, photo=None):
         """Always create User and Profile instances in tandem."""
-        user = User(username=username, email=email)
+        user = User(username=username, email=email, password=password)
         user.save()
         profile = UserProfile(user=user, photo=photo)
         profile.save()

@@ -13,6 +13,11 @@ class ProfileManager(models.Manager):
 
 
 class UserProfile(models.Model):
+    """One-to-one extension to the User model.
+    
+    The only additional field is photo Image field
+    """
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     photo = models.ImageField(upload_to='uploads/', blank=True)
     objects = ProfileManager()

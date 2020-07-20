@@ -132,3 +132,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Authenticate settings
 LOGIN_REDIRECT_URL = 'user:home'
+
+LOGOUT_REDIRECT_URL = 'user:home'
+
+# Media places
+MEDIA_URL = '/uploads/'
+
+UPLOAD_ROOT = os.path.join(BASE_DIR, 'public', 'uploads')

@@ -19,9 +19,8 @@ class HomeView(generic.TemplateView):
 
 
 class RegisterAPIView(generics.CreateAPIView):
-    """
-    POST /api/register/
-    """
+    """POST /api/register/."""
+
     permission_classes = (permissions.AllowAny,)
     serializer_class = ProfileSerializer
     parser_classes = [MultiPartParser, JSONParser]
@@ -57,18 +56,16 @@ class RegisterAPIView(generics.CreateAPIView):
 
 
 class RegisterFormView(FormView):
-    """
-    GET /register_user/
-    """
+    """GET /register_user/."""
+
     form_class = RegisterForm
     template_name = 'html/register.html'
     success_url = reverse_lazy('user:home')
 
 
 class ListUsersAPIView(generics.ListAPIView):
-    """
-    GET list_users/
-    """
+    """GET list_users/."""
+    
     queryset = UserProfile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = (permissions.IsAuthenticated,)

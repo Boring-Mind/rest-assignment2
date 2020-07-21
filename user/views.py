@@ -3,9 +3,12 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.views.generic.edit import FormView
 from rest_framework import generics, permissions
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.parsers import JSONParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import status
-from rest_framework.parsers import JSONParser, MultiPartParser
 
 from .forms import RegisterForm
 from .models import UserProfile
@@ -62,3 +65,29 @@ class RegisterFormView(FormView):
     form_class = RegisterForm
     template_name = 'html/register.html'
     success_url = reverse_lazy('user:home')
+
+
+class ListUsersAPIView(generics.ListAPIView):
+    """
+    GET list_users/
+    """
+    queryset = UserProfile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_list_view(request):
+    qs = UserProfile.objects.select_related('user').only(
+        'user__id', 'user__username', 'user__email', 'photo'
+    )
+    data = []
+    for profile in list(qs):
+        data.append({
+            'id': profile.user.id,
+            'username': profile.user.username,
+            'email': profile.user.email,
+            'photo': profile.photo
+        })
+    return render(request, 'html/list_users.html', {'data': data})

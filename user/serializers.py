@@ -5,9 +5,8 @@ from user.models import UserProfile
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
-        many=False, read_only=True
-    )
+    queryset = User.objects.all()
+    user = serializers.PrimaryKeyRelatedField(queryset=queryset)
     photo = serializers.ImageField(allow_empty_file=True, use_url=True)
 
     class Meta:
@@ -16,13 +15,14 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     username = serializers.CharField(max_length=30)
     email = serializers.EmailField(max_length=254, min_length=6)
     profile = ProfileSerializer()
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'profile']
+        fields = ['id', 'username', 'email', 'profile']
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')

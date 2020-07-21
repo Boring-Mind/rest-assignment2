@@ -15,4 +15,10 @@ urlpatterns = [
         userviews.RegisterFormView.as_view(),
         name='form-register'
     ),
+    path(
+        'api/list_users/',
+        userviews.ListUsersAPIView.as_view(),
+        name='list-users-api'
+    ),
+    path('list_users/', userviews.user_list_view, name='list-users'),
 ]

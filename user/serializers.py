@@ -1,30 +1,41 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from drf_nested_fields.serializers import NestedFieldsSerializerMixin
 
 from user.models import UserProfile
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    queryset = User.objects.all()
-    user = serializers.PrimaryKeyRelatedField(queryset=queryset)
-    photo = serializers.ImageField(allow_empty_file=True, use_url=True)
-
-    class Meta:
-        model = UserProfile
-        fields = ['user', 'photo']
-
-
 class UserSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    username = serializers.CharField(max_length=30)
-    email = serializers.EmailField(max_length=254, min_length=6)
-    profile = ProfileSerializer()
-
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'profile']
+        fields = ['id', 'username', 'email']
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
         user = UserProfile.objects.create(**profile_data, **validated_data)
         return user
+
+
+class ProfileSerializer(NestedFieldsSerializerMixin, serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'user', 'photo']
+        nested_fields = {
+            'user': (
+                ['id'],
+                ['username'],
+                ['email'],
+            )
+        }
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        profile = UserProfile.objects.create(
+            username=user_data.username,
+            email=user_data.email,
+            password=user_data.password,
+            **validated_data
+        )
+        return profile

@@ -11,7 +11,7 @@ from rest_framework.views import status
 
 from .forms import RegisterForm
 from .models import UserProfile
-from .serializers import ProfileSerializer
+from .serializers import ProfileSerializer, UserSerializer
 
 
 class HomeView(generic.TemplateView):
@@ -65,7 +65,7 @@ class RegisterFormView(FormView):
 
 class ListUsersAPIView(generics.ListAPIView):
     """GET list_users/."""
-    
+
     queryset = UserProfile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = (permissions.IsAuthenticated,)

@@ -1,8 +1,9 @@
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.generic.edit import FormView
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
@@ -25,19 +26,22 @@ class RegisterAPIView(generics.CreateAPIView):
     serializer_class = UserSerializer
     parser_classes = [MultiPartParser, JSONParser]
 
-    def init_from_dict(self, data: dict):
+    def init_from_dict(self, data: dict, photo=None):
         self.username = data.get('username')
         self.email = data.get('email')
         self.password = data.get('password1')
         self.password2 = data.get('password2')
-        self.photo = data.get('photo')
+        if photo is not None:
+            self.photo = photo
+        else:
+            self.photo = data.get('photo')
 
     def post(self, request, *args, **kwargs):
         if len(request.POST) > 1:
             form = RegisterForm(request.POST)
             if form.is_valid():
-                self.init_from_dict(request.POST)
-                self.photo = request.FILES.get('photo')
+                photo = request.FILES.get('photo')
+                self.init_from_dict(request.POST, photo=photo)
             else:
                 return render(request, 'html/register.html', {'form': form})
         else:
@@ -69,6 +73,14 @@ class ListUsersAPIView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['username', 'email']
+
+
+def add_orderings(qs: QuerySet, orderings: str) -> QuerySet:
+    orderings = orderings.split(',')
+    qs = qs.order_by(*orderings)
+    return qs
 
 
 @api_view(['GET'])
@@ -77,6 +89,10 @@ def user_list_view(request):
     qs = UserProfile.objects.only(
         'id', 'username', 'email', 'photo'
     )
+
+    if orderings := request.GET.get('ordering'):
+        qs = add_orderings(qs, orderings)
+
     data = []
     for profile in list(qs):
         data.append({
@@ -85,4 +101,5 @@ def user_list_view(request):
             'email': profile.email,
             'photo': profile.photo
         })
+
     return render(request, 'html/list_users.html', {'data': data})

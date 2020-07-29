@@ -1,25 +1,24 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import AbstractUser, UserManager
 
 
-class ProfileManager(models.Manager):
-    def create(self, username, email, password, photo=None):
-        """Always create User and Profile instances in tandem."""
-        user = User(username=username, email=email, password=password)
-        user.save()
-        profile = UserProfile(user=user, photo=photo)
-        profile.save()
-        return profile
+class ProfileManager(UserManager):
+	def create(self, *args, **kwargs):
+		user = UserProfile(*args, **kwargs)
+		user.password = make_password(user.password)
+		user.save()
+		return user
 
 
-class UserProfile(models.Model):
-    """One-to-one extension to the User model.
+class UserProfile(AbstractUser):
+    """Extension to the default User model.
     
     The only additional field is photo Image field
     """
     
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE
+    email = models.EmailField(
+    	unique=True, blank=False, max_length=254, verbose_name='email address'
     )
     photo = models.ImageField(upload_to='uploads/', blank=True)
     objects = ProfileManager()

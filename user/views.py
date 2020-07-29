@@ -11,7 +11,7 @@ from rest_framework.views import status
 
 from .forms import RegisterForm
 from .models import UserProfile
-from .serializers import ProfileSerializer, UserSerializer
+from .serializers import UserSerializer
 
 
 class HomeView(generic.TemplateView):
@@ -22,7 +22,7 @@ class RegisterAPIView(generics.CreateAPIView):
     """POST /api/register/."""
 
     permission_classes = (permissions.AllowAny,)
-    serializer_class = ProfileSerializer
+    serializer_class = UserSerializer
     parser_classes = [MultiPartParser, JSONParser]
 
     def init_from_dict(self, data: dict):
@@ -50,7 +50,7 @@ class RegisterAPIView(generics.CreateAPIView):
             photo=self.photo
         )
         return Response({
-            'data': ProfileSerializer(new_user).data,
+            'data': UserSerializer(new_user).data,
             'status': status.HTTP_201_CREATED
         })
 
@@ -67,22 +67,22 @@ class ListUsersAPIView(generics.ListAPIView):
     """GET list_users/."""
 
     queryset = UserProfile.objects.all()
-    serializer_class = ProfileSerializer
+    serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_list_view(request):
-    qs = UserProfile.objects.select_related('user').only(
-        'user__id', 'user__username', 'user__email', 'photo'
+    qs = UserProfile.objects.only(
+        'id', 'username', 'email', 'photo'
     )
     data = []
     for profile in list(qs):
         data.append({
-            'id': profile.user.id,
-            'username': profile.user.username,
-            'email': profile.user.email,
+            'id': profile.id,
+            'username': profile.username,
+            'email': profile.email,
             'photo': profile.photo
         })
     return render(request, 'html/list_users.html', {'data': data})

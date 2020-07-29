@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django import forms
+from .models import UserProfile
 
 
 class RegisterForm(UserCreationForm):
@@ -23,6 +24,16 @@ class RegisterForm(UserCreationForm):
         widget=forms.PasswordInput()
     )
     photo = forms.ImageField(required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            'username',
+            'email',
+            'password1',
+            'password2',
+            'photo'
+        )
 
     def crispy_init(self):
         """Initialize crispy-forms helper."""

@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -15,6 +16,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SITE_ID = 1
+
 
 # Application definition
 
@@ -25,9 +28,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user',
+    'django.contrib.sites',
+    # Third-party
     'crispy_forms',
     'rest_framework',
+    # Local
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -134,7 +140,7 @@ MIN_PASSWORD_LENGTH = 8
 
 MEDIA_URL = '/uploads/'
 
-UPLOAD_ROOT = os.path.join(BASE_DIR, 'public', 'uploads')
+UPLOAD_ROOT = os.path.join(BASE_DIR, 'uploads')
 
 # REST configuration
 
@@ -142,8 +148,24 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }
+
+REST_USE_JWT = True
+
+SIMPLE_JWT = {
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'duGkFH2cppsiRnBlXo0fjo75DWR1jmmGt62jJGglDX7tlSDPXVfCnz3kFordMZh',
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=1),
+}
+
+AUTH_USER_MODEL = 'user.UserProfile'

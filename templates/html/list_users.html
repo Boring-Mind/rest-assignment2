@@ -9,7 +9,13 @@
                     <p>User {{ user.id }}:</p>
                     <p>username: {{ user.username }}</p>
                     <p>email: {{ user.email }}</p>
-                    <p>photo: {{ user.photo }}</p><br>
+                    {% if user.photo %}
+                        <div class="col-5 p-0">
+                            <img class="img-fluid img-thumbnail" src="/{{ user.photo.name }}">
+                        </div>
+                    {% else %}
+                        <p>No photo available</p><br>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>

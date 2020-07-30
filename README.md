@@ -1,5 +1,4 @@
-# rest-assignment2
-Test assignment of the Craft Group
+## Тестовое задание для Craft Group
 
 ## Установка:
 1. Создаем новое виртуальное окружение и клонируем туда наш проект.

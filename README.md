@@ -4,22 +4,30 @@ Test assignment of the Craft Group
 ## Установка:
 1. Создаем новое виртуальное окружение и клонируем туда наш проект.
 
-* python3 -m venv assignment
-* cd assignment
-* . bin/activate
-* mkdir src && cd src
-* git clone https://github.com/Boring-Mind/rest-assignment2 .
+```shell
+python3.8 -m venv assignment
+cd assignment
+. bin/activate
+mkdir src && cd src
+git clone https://github.com/Boring-Mind/rest-assignment2 .
+```
+
+> Если в системе нет python версии 3.8, то устанавливаем его по [инструкции](https://phoenixnap.com/kb/how-to-install-python-3-ubuntu).
 
 2. Устанавливаем зависимости
 
-* pip install -U pip
-* pip install -r requirements.txt
+```shell
+pip install -U pip
+pip install -r requirements.txt
+```
 
 3. Инициализируем базу данных и запускаем проект
 
-* python manage.py makemigrations
-* python manage.py migrate
-* python manage.py runserver
+```shell
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+```
 
 4. Тестируем проект
 
